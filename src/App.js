@@ -1,24 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect, createContext } from "react";
+import "./App.css";
+import Navbar from "./Components/Navbar";
+import Main from "./Components/Main";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import axios from 'axios'
 
+
+export const context = createContext();
 function App() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:9027/products")
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        setProducts(data);
+      });
+  }, []); // Empty dependency array means this effect runs only once after the first render
+
+  // const menuItems = [...new Set(products.map((val) => val.color))];
+
+  // const menuItemSize = [...new Set(products.map((val) => val.size))];
+
+  const filterData = (cat) => {
+    const newData = products.filter((newVal) => newVal.color === cat);
+    setProducts(newData);
+  };
+
+
+  const filterDataSize = (cat) => {
+    const newData = products.filter((newVal) => newVal.size === cat);
+    setProducts(newData);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <context.Provider value={{products:products,filterDataSize}}>
+        <Navbar />
+        <Main products={products} filterDataSize={filterDataSize} filterData={filterData}/>
+        
+      </context.Provider>
+
+      
     </div>
+    
   );
 }
 
